@@ -33,7 +33,7 @@ class CreateTrack(graphene.Mutation):
     def mutate(self, info, **kwargs):
         user = info.context.user
         if user.is_anonymous:
-            raise Exception("Log in to add a track.")
+            raise GraphQLError("Log in to add a track.")
 
         title = kwargs.get('title')
         description = kwargs.get('description')
@@ -55,7 +55,7 @@ class UpdateTrack(graphene.Mutation):
     def mutate(self, info, **kwargs):
         user = info.context.user
         if user.is_anonymous:
-            raise Exception("Log in to add a track.")
+            raise GraphQLError("Log in to add a track.")
 
         track_id = kwargs.get('track_id')
         title = kwargs.get('title')
@@ -64,7 +64,7 @@ class UpdateTrack(graphene.Mutation):
         track = Track.objects.get(id=track_id)
 
         if track.posted_by != user:
-            raise Exception("Not permitted to update this track.")
+            raise GraphQLError("Not permitted to update this track.")
         
         track.title = title
         track.description = description
@@ -82,13 +82,13 @@ class DeleteTrack(graphene.Mutation):
     def mutate(self, info, **kwargs):
         user = info.context.user
         if user.is_anonymous:
-            raise Exception("Log in to add a track.")
+            raise GraphQLError("Log in to add a track.")
 
         track_id = kwargs.get('track_id')
         track = Track.objects.get(id=track_id)
 
         if track.posted_by != user:
-            raise Exception("Not permitted to update this track.")
+            raise GraphQLError("Not permitted to update this track.")
     
         track.delete()
         return DeleteTrack(track_id=track_id)
@@ -103,13 +103,13 @@ class CreateLike(graphene.Mutation):
     def mutate(self, info, **kwargs):
         user = info.context.user
         if user.is_anonymous:
-            raise Exception("Log in to add a track.")
+            raise GraphQLError("Log in to add a track.")
 
         track_id = kwargs.get('track_id')
         track = Track.objects.get(id=track_id)
 
         if not track:
-            raise Exception("Can't find track with given track_id.")
+            raise GraphQLError("Can't find track with given track_id.")
         
         Like.objects.create(
             user=user,
